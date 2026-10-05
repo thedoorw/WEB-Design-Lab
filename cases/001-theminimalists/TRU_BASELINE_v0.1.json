@@ -1,0 +1,57 @@
+{
+  "case": "001-theminimalists",
+  "source": {
+    "architecture_reference": "https://www.theminimalists.com/",
+    "visual_baseline": "https://tru.spyr.me/",
+    "relationship": "BYLT states tru is based on the custom website created for The Minimalists."
+  },
+  "capture": {
+    "validated_run": 37308264476,
+    "validated_head_sha": "75285e7e365d1db4c59d2e3013614c3db4b132b2",
+    "artifact_id": 11344149778,
+    "date": "2026-10-05"
+  },
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "content_width": 500,
+      "heading_y": [525, 1416, 1770, 2117, 2464],
+      "heading_font_px": [31, 24, 24, 24, 24],
+      "nav": {"x": 470, "y": 148, "width": 500, "height": 45},
+      "intro_image": {"x": 470, "y": 251, "width": 240, "height": 164},
+      "page_scroll_height": 2950
+    },
+    "compact": {
+      "width": 1024,
+      "height": 768,
+      "content_width": 500,
+      "heading_y": [525, 1416, 1770, 2117, 2464],
+      "heading_font_px": [31, 24, 24, 24, 24],
+      "nav": {"x": 262, "y": 148, "width": 500, "height": 45},
+      "intro_image": {"x": 262, "y": 251, "width": 240, "height": 164},
+      "page_scroll_height": 2943
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "content_width": 330,
+      "heading_y": [317, 1508, 2176, 2844, 3513],
+      "heading_font_px": [31, 20.875, 20.875, 20.875, 20.875],
+      "nav": {"x": 30, "y": 140, "width": 330, "height": 44},
+      "page_scroll_height": 3947
+    }
+  },
+  "tolerances": {
+    "heading_y_px": 20,
+    "content_width_px": 2,
+    "heading_font_px": 1,
+    "horizontal_overflow_px": 0
+  },
+  "notes": [
+    "The Minimalists live site blocks GitHub Actions headless Chromium with Cloudflare.",
+    "tru demo is used as the validated visual paper-pattern baseline.",
+    "A later tru capture was rejected because external assets/layout produced implausible page dimensions.",
+    "Routine QA compares local output against this frozen validated baseline; live/theme recapture is optional evidence refresh."
+  ]
+}
