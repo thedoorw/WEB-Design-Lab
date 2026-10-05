@@ -1,0 +1,36 @@
+{
+  "items": [
+    {
+      "id": "p001",
+      "title": "A Poster Built from Three Rules",
+      "kind": "Project",
+      "year": "2026",
+      "summary": "A compact study in type, repetition, and deliberate limits.",
+      "mediaLabel": "Featured artwork"
+    },
+    {
+      "id": "p002",
+      "title": "Grid Without Lines",
+      "kind": "Process",
+      "year": "2026",
+      "summary": "A short note about rhythm and alignment without exposing the underlying grid.",
+      "mediaLabel": "Process image"
+    },
+    {
+      "id": "p003",
+      "title": "Twelve Arrangements",
+      "kind": "Study",
+      "year": "2026",
+      "summary": "One module repeated until the variations begin to behave like a visual language.",
+      "mediaLabel": "Arrangement image"
+    },
+    {
+      "id": "p004",
+      "title": "Reading Space",
+      "kind": "Research",
+      "year": "2025",
+      "summary": "A study of narrow pages, pacing, and the relationship between text and image.",
+      "mediaLabel": "Reading image"
+    }
+  ]
+}

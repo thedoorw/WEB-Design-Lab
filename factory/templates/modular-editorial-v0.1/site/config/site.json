@@ -1,0 +1,48 @@
+{
+  "identity": {
+    "name": "FIELD NOTES",
+    "tagline": "work · process · notes"
+  },
+  "settings": {
+    "contentWidth": 540,
+    "mobileWidth": 330,
+    "breakpoint": 720,
+    "colors": {
+      "page": "#ffffff",
+      "ink": "#171717",
+      "muted": "#7d7d7d",
+      "line": "#d8d8d8",
+      "soft": "#f1f1f1"
+    },
+    "type": {
+      "bodyPx": 14,
+      "displayPx": 32,
+      "entryTitlePx": 24,
+      "mobileEntryTitlePx": 21
+    },
+    "rhythm": {
+      "entryGapPx": 96,
+      "mobileEntryGapPx": 132
+    }
+  },
+  "shell": {
+    "navigation": [
+      {"label": "Home", "href": ""},
+      {"label": "Start", "href": "start/"},
+      {"label": "Archive", "href": "archive/"},
+      {"label": "Settings", "href": "settings-preview/"}
+    ],
+    "footer": {
+      "left": "© Field Notes",
+      "right": "Modular Editorial Starter"
+    }
+  },
+  "pages": {
+    "home": "config/pages/home.json",
+    "start": "config/pages/start.json",
+    "archive": "config/pages/archive.json"
+  },
+  "content": {
+    "projects": "config/content/projects.json"
+  }
+}

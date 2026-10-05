@@ -1,0 +1,32 @@
+{
+  "id": "home",
+  "title": "Field Notes",
+  "settings": {
+    "contentWidth": 500
+  },
+  "modules": [
+    {
+      "type": "promo",
+      "text": "A quiet archive for work, process, and notes."
+    },
+    {
+      "type": "introSplit",
+      "mediaLabel": "Studio image",
+      "text": "This page demonstrates a 500px page override while the site default remains 540px."
+    },
+    {
+      "type": "featuredEntry",
+      "projectId": "p001"
+    },
+    {
+      "type": "entryStream",
+      "projectIds": ["p002", "p003", "p004"]
+    },
+    {
+      "type": "pagination",
+      "current": "1",
+      "nextLabel": "Archive",
+      "nextHref": "archive/"
+    }
+  ]
+}

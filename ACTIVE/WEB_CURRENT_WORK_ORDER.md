@@ -2,89 +2,107 @@
 
 ROLE = WEB Factory / WR
 PROGRAM = WEB-Design-Lab
-STATUS = FACTORY_STARTER_READY
+STATUS = MODULAR_FACTORY_v0.1_PASS
 USER_FIDELITY_GATE_REQUIRED = NO
 
 ## Completed
 
-### Case 001 — reproduction method
+### Case 001
 
-```text
-REFERENCE = The Minimalists
-RESULT = PASS
-PR = #1
-MAIN_MERGE = 94e2dddf345706a3272cbeacf2028c8f5747c8ee
-```
+The Minimalists reproduction method:
+- reference classification;
+- synthetic-content reconstruction;
+- frozen visual baseline;
+- automatic comparison;
+- responsive correction;
+- PASS.
 
-Case 001 proved:
-
-```text
-public reference
-→ fast architecture classification
-→ synthetic-content reconstruction
-→ browser capture
-→ alternate visual baseline when live capture is blocked
-→ frozen validated geometry
-→ automated responsive comparison
-→ bounded correction
-→ PASS
-```
-
-### Factory extraction
-
-Reusable starter:
+### Editorial starter
 
 `factory/templates/editorial-shell-v0.1/`
 
-Handoff boundary:
+Smoke QA:
+`PASS`
 
-`factory/SITE_REPO_HANDOFF_BOUNDARY_v0.1.md`
+### Modular architecture
 
-Reference baseline protocol:
+`factory/templates/modular-editorial-v0.1/`
 
-`factory/REFERENCE_BASELINE_PROTOCOL_v0.1.md`
+Architecture:
+`factory/MODULAR_SITE_ARCHITECTURE_v0.1.md`
 
-Starter smoke QA:
+QA:
+`factory/templates/modular-editorial-v0.1/QA.md`
 
-```text
-RUN_ID = 37311908543
-RESULT = PASS
-DESKTOP_1440 = PASS
-COMPACT_1024 = PASS
-MOBILE_390 = PASS
-HORIZONTAL_OVERFLOW = 0
-```
+GitHub Actions:
+`RUN_ID = 37315358965`
 
-## Current factory rule
+Result:
+`PASS`
 
-Do not start future reproduction work with exhaustive manual research.
+## Proven model
 
 ```text
-TARGET
-→ classify quickly
-→ choose or clone a starter
-→ build
-→ obtain one valid reference baseline
-→ freeze baseline
-→ automate comparison
-→ correct measured deltas
+Site Settings
++ Site Shell
++ Page Recipe
++ Content Modules
++ Content Data
+= Rendered Website
 ```
 
-## Site Repo gate
+Verified configuration behavior:
 
-A formal production Site Repo is created only after these are decided:
+```text
+SITE DEFAULT WIDTH = 540px
+HOME PAGE OVERRIDE = 500px
+MOBILE WIDTH = 330px
+SETTINGS PREVIEW 500 ↔ 540 = PASS
+```
 
-1. actual portfolio identity / name;
-2. production route map;
-3. initial content set;
-4. selected shell or hybrid;
-5. repository name + Pages/domain target.
+## Current module registry
 
-The reproduction Lab remains the method/reference/template SSOT.
-The formal Site Repo becomes the production website SSOT.
+- promo
+- introSplit
+- featuredEntry
+- entryStream
+- richText
+- archiveList
+- spacer
+- pagination
+
+## Production principle
+
+A website reproduction should no longer terminate at copied appearance.
+
+It should extract reusable:
+- settings;
+- shell;
+- page recipes;
+- modules;
+- content structure.
+
+## Future admin boundary
+
+A later `/admin/` may edit the JSON/config layer:
+- site settings;
+- page overrides;
+- module order;
+- module parameters;
+- content data.
+
+Authentication and GitHub-write persistence are separate future work.
 
 ## Next
 
-Await production-site definition or begin Case 002 if the goal is to broaden the Factory grammar before creating the formal portfolio repo.
+Next logical Factory step:
+
+```text
+MODULAR EDITOR
+→ persistent admin data model
+→ GitHub write/auth boundary
+```
+
+or create the first formal Site Repo using `modular-editorial-v0.1`.
 
 No Pages deployment is authorized by this work order.
