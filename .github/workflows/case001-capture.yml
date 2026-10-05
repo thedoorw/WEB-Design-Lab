@@ -1,0 +1,54 @@
+name: Case 001 Capture
+
+on:
+  push:
+    branches:
+      - work/case-001-theminimalists
+    paths:
+      - 'cases/001-theminimalists/site/**'
+      - 'factory/capture/case001-capture.mjs'
+      - '.github/workflows/case001-capture.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: case-001-capture-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/web-case001-server.log 2>&1 &
+          echo $! > /tmp/web-case001-server.pid
+          sleep 2
+          curl --fail http://127.0.0.1:4173/cases/001-theminimalists/site/ > /dev/null
+
+      - name: Capture reference and reconstruction
+        env:
+          LOCAL_BASE: http://127.0.0.1:4173/cases/001-theminimalists/site/
+          OUT_DIR: artifacts/case001
+        run: node factory/capture/case001-capture.mjs
+
+      - name: Upload capture artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: case001-capture
+          path: artifacts/case001/
+          if-no-files-found: error

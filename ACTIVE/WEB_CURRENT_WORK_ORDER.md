@@ -3,54 +3,60 @@
 ROLE = WEB Factory / WR
 CASE = 001-theminimalists
 REFERENCE = https://www.theminimalists.com/
-STATUS = ACTIVE
+STATUS = CASE_001_BASELINE_PASS
 USER_FIDELITY_GATE_REQUIRED = NO
 
-## Objective
+## Completed objective
 
-Reproduce The Minimalists presentation architecture as an editorial/book-like portfolio shell using the fastest viable reconstruction path.
-
-This is not an original redesign.
-
-## Primary method
+The first website-reproduction case has established a working factory loop:
 
 ```text
-URL reconstruction first
-→ working scaffold
-→ remove/replace source content/assets
-→ compare to live source
-→ correct measurable deltas
+public reference
+→ fast architecture classification
+→ synthetic-content reconstruction
+→ browser capture
+→ fallback when live capture is blocked
+→ validated visual baseline
+→ frozen geometry
+→ automated responsive comparison
+→ bounded correction
+→ PASS
 ```
 
-Preferred accelerator:
-- Replit Design URL import/reconstruction.
+## Case 001 acceptance
 
-Fallback:
-- direct independent implementation from public browser evidence.
+```text
+DESKTOP_1440 = PASS
+COMPACT_1024 = PASS
+MOBILE_390 = PASS
+HORIZONTAL_OVERFLOW = 0
+BASELINE_PASS = true
+```
 
-## Minimum case surface
+Evidence:
+- `cases/001-theminimalists/CASE_STATUS.md`
+- `cases/001-theminimalists/TRU_BASELINE_v0.1.json`
+- `factory/capture/case001-capture.mjs`
+- GitHub Actions run `37310869405`
 
-- homepage editorial stream;
-- article/project detail;
-- Start-style long-form index;
-- Resources-style repeated index;
-- Archives/pagination;
-- shared navigation/footer;
-- desktop/tablet/mobile behavior.
+## Current factory rule
 
-## Acceptance
+Do not begin future cases with exhaustive manual research.
 
-Factory/WR reviews against the public reference.
+```text
+TARGET
+→ classify quickly
+→ choose reconstruction path
+→ build working first version
+→ establish/freeze valid baseline
+→ automate comparison
+→ correct measured deltas
+```
 
-Acceptance requires:
-- runnable implementation;
-- no protected source content/assets used as production content;
-- same-viewport comparison;
-- no material unexplained responsive/interaction gaps;
-- GitHub-traceable source.
-
-USER is not required to approve ordinary fidelity corrections.
+External reference recapture is evidence refresh, not a required dependency for every revision.
 
 ## Next
 
-Produce the first working scaffold and begin same-viewport correction.
+Extract Case 001 into a reusable starter/template and define the handoff boundary for the first formal Site Repo.
+
+No USER fidelity approval is required for the completed Case 001 baseline.
