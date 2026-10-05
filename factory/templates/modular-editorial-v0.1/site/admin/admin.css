@@ -269,8 +269,9 @@ input[type="color"]{
 }
 
 .preview-shell{
-  width:min(100%,var(--preview-width));
+  width:var(--preview-width);
   min-width:280px;
+  max-width:none;
   margin:0 auto;
   background:#fff;
   box-shadow:0 1px 12px rgba(0,0,0,.12);
