@@ -46,7 +46,9 @@ const els={
   revisionSelect:document.querySelector('#revision-select'),
   restoreRevision:document.querySelector('#restore-revision'),
   apiStatus:document.querySelector('#api-status'),
-  commitMessage:document.querySelector('#commit-message')
+  commitMessage:document.querySelector('#commit-message'),
+  loginGithub:document.querySelector('#login-github'),
+  logoutGithub:document.querySelector('#logout-github')
 };
 
 const moduleTypes=[
@@ -179,26 +181,33 @@ async function refreshApiStatus(){
     apiState=null;
     els.apiStatus.textContent='Admin API: not configured';
     els.saveGithub.disabled=true;
+    els.loginGithub.disabled=true;
+    els.logoutGithub.disabled=true;
     return null;
   }
 
   try{
     apiState=await apiClient.status();
-    const user=apiState.user?.login || 'unknown user';
+    const authenticated=Boolean(apiState.authenticated);
+    const user=apiState.user?.login || 'not signed in';
     els.apiStatus.textContent=[
       'Admin API: connected',
-      `Authenticated: ${apiState.authenticated ? 'yes' : 'no'}`,
+      `Authenticated: ${authenticated ? 'yes' : 'no'}`,
       `User: ${user}`,
       `Repository: ${apiState.repository || 'not reported'}`,
       `Branch: ${apiState.branch || 'not reported'}`,
       `Head: ${apiState.head || 'not reported'}`
     ].join('\n');
-    els.saveGithub.disabled=!apiState.authenticated;
+    els.saveGithub.disabled=!authenticated;
+    els.loginGithub.disabled=authenticated;
+    els.logoutGithub.disabled=!authenticated;
     return apiState;
   }catch(error){
     apiState=null;
     els.apiStatus.textContent=`Admin API: unavailable\n${error.message}`;
     els.saveGithub.disabled=true;
+    els.loginGithub.disabled=false;
+    els.logoutGithub.disabled=true;
     return null;
   }
 }
@@ -716,6 +725,18 @@ async function init(){
       setStatus(`Restored snapshot #${id} · saved locally`);
     });
 
+    els.loginGithub.addEventListener('click',()=>{
+      if(!apiClient?.configured) return;
+      apiClient.beginLogin(location.href);
+    });
+
+    els.logoutGithub.addEventListener('click',async()=>{
+      apiClient?.clearSession();
+      apiState=null;
+      await refreshApiStatus();
+      setStatus('GitHub admin session cleared');
+    });
+
     els.saveGithub.addEventListener('click',async()=>{
       if(!apiClient?.configured || !apiState?.authenticated) return;
       const message=els.commitMessage.value.trim() || 'Update modular site';
@@ -745,6 +766,11 @@ async function init(){
         updateSummary();
         setStatus(`Repository commit created: ${result.commitSha || 'unknown'}`);
       }catch(error){
+        if(error.status===401){
+          apiClient?.clearSession();
+          apiState=null;
+          await refreshApiStatus();
+        }
         setStatus(`Repository save failed: ${error.message}`);
       }finally{
         els.saveGithub.disabled=!apiState?.authenticated;
