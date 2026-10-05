@@ -3,16 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Modular Editor v0.1</title>
+<title>Modular Editor v0.2</title>
 <link rel="stylesheet" href="./admin.css">
 </head>
 <body>
 <header class="editor-topbar">
   <div>
-    <strong>Modular Editor v0.1</strong>
+    <strong>Modular Editor v0.2</strong>
     <span class="editor-status" id="status">Loading…</span>
   </div>
   <div class="topbar-actions">
+    <button type="button" id="save-local">Save local</button>
+    <button type="button" id="snapshot-draft">Snapshot</button>
+    <button type="button" id="save-github" disabled>Save to GitHub</button>
     <button type="button" id="reset-source">Reset to source</button>
     <button type="button" id="export-bundle">Export JSON bundle</button>
   </div>
@@ -112,8 +115,31 @@
     </section>
 
     <section class="panel">
+      <h2>Persistence</h2>
+      <p class="hint">Drafts persist in this browser. Repository writes require the configured authenticated Admin API.</p>
+      <pre id="local-status" class="bundle-summary"></pre>
+
+      <div class="two-col">
+        <label>
+          Revision
+          <select id="revision-select"></select>
+        </label>
+        <label>
+          Restore
+          <button type="button" id="restore-revision">Restore revision</button>
+        </label>
+      </div>
+
+      <pre id="api-status" class="bundle-summary">Admin API: checking…</pre>
+      <label>
+        Commit message
+        <input id="commit-message" type="text" value="Update modular site">
+      </label>
+    </section>
+
+    <section class="panel">
       <h2>Draft bundle</h2>
-      <p class="hint">This version is local/session-only. Export before closing if you want to keep the draft.</p>
+      <p class="hint">Export/import remains available as a portable backup boundary.</p>
       <label class="file-label">
         Import JSON bundle
         <input id="import-bundle" type="file" accept="application/json,.json">
