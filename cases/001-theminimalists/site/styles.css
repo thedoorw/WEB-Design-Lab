@@ -27,7 +27,7 @@ a{color:inherit;text-decoration-thickness:1px;text-underline-offset:.18em}
 a:hover{opacity:.62}
 img{max-width:100%;display:block}
 .shell{width:min(calc(100% - 40px),var(--shell));margin-inline:auto}
-.reading{width:min(100%,var(--reading));margin-inline:auto}
+.reading{width:min(calc(100% - 40px),var(--reading));margin-inline:auto}
 .site-header{
   padding:28px 0 18px;
   border-bottom:1px solid var(--line);
@@ -88,7 +88,7 @@ h4{font-size:1.08rem;margin-bottom:.45rem}
 .footer-row{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 .footer-row a{color:inherit}
 @media (max-width:720px){
-  .shell{width:min(calc(100% - 28px),var(--shell))}
+  .shell,.reading{width:min(calc(100% - 28px),var(--shell))}
   .site-header{padding:20px 0 14px}
   .header-row{align-items:center}
   .nav-toggle{display:block;font-size:.82rem;text-transform:uppercase;letter-spacing:.08em}
