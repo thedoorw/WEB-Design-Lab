@@ -1,6 +1,6 @@
 # Modular Editorial Starter v0.1
 
-STATUS = MODULAR_EDITOR_v0.1_PASS
+STATUS = PERSISTENT_ADMIN_v0.2_PASS
 DERIVED_FROM = editorial-shell-v0.1 + Case 001 lessons
 
 ## Purpose
@@ -16,16 +16,6 @@ Site Settings
 = Rendered Website
 ```
 
-## Core rule
-
-A reproduced website should leave behind editable grammar.
-
-The same shell can therefore become:
-- 500px or 540px wide;
-- a journal, portfolio, archive, or hybrid;
-- a different home page simply by changing module order;
-- a new production site without rewriting the whole HTML document.
-
 ## Structure
 
 ```text
@@ -40,7 +30,10 @@ site/
 ├─ admin/
 │  ├─ index.html
 │  ├─ admin.css
-│  └─ admin.js
+│  ├─ admin.js
+│  ├─ draft-store.js
+│  ├─ admin-api.js
+│  └─ admin-config.json
 ├─ styles.css
 ├─ runtime.js
 └─ config/
@@ -61,7 +54,7 @@ Site default
 → temporary Editor override
 ```
 
-Example:
+Current proof:
 
 ```text
 site default = 540px
@@ -69,7 +62,7 @@ home override = 500px
 mobile = 330px
 ```
 
-## Supported page modules
+## Supported modules
 
 - promo
 - introSplit
@@ -80,35 +73,48 @@ mobile = 330px
 - spacer
 - pagination
 
-The module registry lives in `runtime.js`.
-
-## Editor
+## Admin
 
 Open:
 
 `site/admin/`
 
-Current Editor capabilities:
+Current capabilities:
+
 - site settings;
-- per-page width override/inheritance;
-- page selection;
+- per-page width inheritance/override;
 - module add/delete;
 - drag reorder;
 - module JSON editing;
-- content/project editing;
-- live preview;
-- exact 1440 / 1024 / 390 viewport preview;
-- session draft;
-- reset;
-- JSON bundle import/export.
+- project/content editing;
+- exact 1440 / 1024 / 390 preview;
+- IndexedDB persistent draft;
+- revision snapshots + restore;
+- JSON bundle import/export;
+- repository sync-state display;
+- authenticated Admin API client boundary;
+- Save-to-GitHub control enabled only when the Admin API reports an authenticated session.
 
-The Editor does not yet write back to GitHub.
+## Persistence
+
+Local persistence is real and proven.
+
+Repository persistence is separated behind:
+
+`factory/ADMIN_PERSISTENCE_API_CONTRACT_v0.1.md`
+
+The included mock backend proves validation, conflict detection and allow-listed bundle-to-file mapping.
+
+It does not claim a real GitHub commit.
 
 See:
-`factory/MODULAR_EDITOR_v0.1.md`
 
-## Production boundary
+- `factory/MODULAR_EDITOR_v0.1.md`
+- `factory/PERSISTENT_ADMIN_v0.2.md`
+- `factory/PERSISTENT_ADMIN_QA_v0.2.md`
 
-For routine publishing, a later authenticated persistence layer should commit validated config/content changes to a formal Site Repo.
+## Security
 
-Do not expose GitHub credentials in static Pages JavaScript.
+Never expose GitHub PATs, OAuth secrets or GitHub App private keys in static Pages JavaScript.
+
+The trusted persistence service owns repository credentials and commit operations.

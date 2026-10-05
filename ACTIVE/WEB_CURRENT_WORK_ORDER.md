@@ -2,7 +2,7 @@
 
 ROLE = WEB Factory / WR
 PROGRAM = WEB-Design-Lab
-STATUS = MODULAR_EDITOR_v0.1_PASS
+STATUS = PERSISTENT_ADMIN_v0.2_PASS
 USER_FIDELITY_GATE_REQUIRED = NO
 
 ## Completed chain
@@ -11,33 +11,11 @@ USER_FIDELITY_GATE_REQUIRED = NO
 Case 001 reproduction
 → editorial starter
 → modular architecture
-→ modular editor
+→ Modular Editor v0.1
+→ Persistent Admin v0.2
 ```
 
-### Case 001
-
-The Minimalists reproduction method:
-- synthetic-content reconstruction;
-- frozen baseline;
-- automatic responsive comparison;
-- PASS.
-
-### Modular architecture
-
-`factory/templates/modular-editorial-v0.1/`
-
-Proven model:
-
-```text
-Site Settings
-+ Site Shell
-+ Page Recipe
-+ Content Modules
-+ Content Data
-= Rendered Website
-```
-
-### Modular Editor v0.1
+## Persistent Admin v0.2
 
 Implementation:
 
@@ -45,70 +23,90 @@ Implementation:
 
 Specification:
 
-`factory/MODULAR_EDITOR_v0.1.md`
+`factory/PERSISTENT_ADMIN_v0.2.md`
+
+API contract:
+
+`factory/ADMIN_PERSISTENCE_API_CONTRACT_v0.1.md`
 
 QA:
 
-`factory/templates/modular-editorial-v0.1/EDITOR_QA.md`
+`factory/PERSISTENT_ADMIN_QA_v0.2.md`
 
-GitHub Actions:
+Final automated evidence:
 
 ```text
-RUN_ID = 37317054754
-ARTIFACT_ID = 11347414828
+RUN_ID = 37318728940
+ARTIFACT_ID = 11349546661
 RESULT = PASS
 ```
 
-## Proven Editor behavior
+## Proven
 
-- site settings editing;
-- page settings / inherit / override;
-- 500 / 540 / custom width control;
-- exact 1440 / 1024 / 390 preview viewports;
-- page recipe switching;
+### Browser persistence
+
+- IndexedDB autosave;
+- draft survives browser restart;
+- manual revision snapshots;
+- revision restore;
+- repository-sync state persisted;
+- post-commit state clears pending flag.
+
+### Editor
+
+- Site Settings;
+- page width inheritance/override;
+- 500 / 540 / custom width;
 - module add/delete;
 - drag reorder;
-- button reorder fallback;
-- module JSON edit;
-- project/content editing;
-- session draft;
-- import/export JSON bundle;
-- reset to repository source;
-- live preview through production runtime.
+- content editing;
+- true 1440 / 1024 / 390 preview;
+- JSON import/export.
 
-Regression:
+### Admin API boundary
 
-`MODULAR_EDITORIAL = PASS`
+- authenticated status contract;
+- commit request contract;
+- fixed bundle → file allow-list;
+- exact HEAD / baseRevision behavior;
+- stale revision conflict;
+- invalid module/path rejection.
 
-Errors:
+Mock backend validation:
 
 ```text
-page = 0
-module = 0
-boot = 0
+commit flow = PASS
+allow-list mapping = PASS
+409 stale HEAD = PASS
+422 invalid module/path = PASS
 ```
 
-## Current persistence boundary
+## Important boundary
 
-Editor v0.1 is intentionally local/session-only.
+The mock backend proves the production contract but does not write GitHub.
 
-It does not:
-- authenticate;
-- write to GitHub;
-- store credentials;
-- deploy Pages.
+Not yet configured:
+
+- real GitHub sign-in;
+- GitHub App / OAuth credentials;
+- serverless persistence deployment;
+- real repository commit;
+- public GitHub Pages deployment.
+
+No GitHub secret is stored in browser code.
 
 ## Next
 
-Next logical Factory task:
+Next Factory task:
 
 ```text
-PERSISTENT ADMIN DATA MODEL
-→ GitHub authentication/write boundary
-→ validated commit
-→ automated deployment
+REAL GITHUB ADAPTER
+→ GitHub App / OAuth configuration
+→ server-side commit implementation
+→ real private test commit
+→ deployment pipeline
 ```
 
-Before public deployment, USER remains the checkpoint for visibility/deployment decisions.
+The next step reaches an account/security boundary: a GitHub App or equivalent authenticated backend must be configured before a real repository write can be proven.
 
-No Pages deployment is authorized by this work order.
+Public deployment remains a USER checkpoint and is not authorized by this work order.
