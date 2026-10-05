@@ -10,6 +10,10 @@ on:
       - '.github/workflows/case001-capture.yml'
   workflow_dispatch:
 
+concurrency:
+  group: case-001-capture-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   capture:
     runs-on: ubuntu-latest
