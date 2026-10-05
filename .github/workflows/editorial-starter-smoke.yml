@@ -1,0 +1,48 @@
+name: Editorial Starter Smoke
+
+on:
+  push:
+    branches:
+      - work/factory-editorial-starter-001
+    paths:
+      - 'factory/templates/editorial-shell-v0.1/**'
+      - 'factory/capture/editorial-starter-smoke.mjs'
+      - '.github/workflows/editorial-starter-smoke.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: editorial-starter-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/editorial-starter.log 2>&1 &
+          sleep 2
+          curl --fail http://127.0.0.1:4173/factory/templates/editorial-shell-v0.1/site/ > /dev/null
+
+      - name: Smoke test starter
+        run: node factory/capture/editorial-starter-smoke.mjs
+
+      - name: Upload smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-starter-smoke
+          path: artifacts/editorial-starter/
+          if-no-files-found: error

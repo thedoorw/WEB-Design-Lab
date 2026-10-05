@@ -1,0 +1,29 @@
+{
+  "template": "editorial-shell-v0.1",
+  "type": "static-portfolio-shell",
+  "dependencies": [],
+  "hosting": ["github-pages", "static-host"],
+  "responsive_breakpoint_px": 720,
+  "required_case_overrides": [
+    "site identity",
+    "content",
+    "navigation",
+    "content width",
+    "mobile width",
+    "typography scale",
+    "entry rhythm",
+    "assets",
+    "reference baseline"
+  ],
+  "qa_required": [
+    "desktop viewport",
+    "compact viewport",
+    "mobile viewport",
+    "horizontal overflow",
+    "reference-baseline comparison"
+  ],
+  "provenance": {
+    "method_case": "001-theminimalists",
+    "status": "genericized"
+  }
+}
