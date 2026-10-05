@@ -2,7 +2,7 @@
 
 ROLE = WEB Factory / WR
 PROGRAM = WEB-Design-Lab
-STATUS = PERSISTENT_ADMIN_v0.2_PASS
+STATUS = GITHUB_APP_ADAPTER_v0.1_READY_FOR_ACCOUNT_SETUP
 USER_FIDELITY_GATE_REQUIRED = NO
 
 ## Completed chain
@@ -13,100 +13,84 @@ Case 001 reproduction
 → modular architecture
 → Modular Editor v0.1
 → Persistent Admin v0.2
+→ GitHub App Adapter v0.1
 ```
 
-## Persistent Admin v0.2
+## Persistent Admin
+
+Browser persistence is proven:
+- IndexedDB autosave;
+- browser restart restore;
+- revision snapshots;
+- revision restore;
+- pending/synchronized state.
+
+## GitHub App Adapter v0.1
 
 Implementation:
 
-`factory/templates/modular-editorial-v0.1/site/admin/`
+`factory/persistence/github-app-worker/`
 
 Specification:
 
-`factory/PERSISTENT_ADMIN_v0.2.md`
+`factory/GITHUB_APP_ADAPTER_v0.1.md`
 
-API contract:
+Setup checklist:
 
-`factory/ADMIN_PERSISTENCE_API_CONTRACT_v0.1.md`
+`factory/GITHUB_APP_REAL_WRITE_SETUP_v0.1.md`
 
 QA:
 
-`factory/PERSISTENT_ADMIN_QA_v0.2.md`
+`factory/GITHUB_APP_ADAPTER_QA_v0.1.md`
 
-Final automated evidence:
+Final automated run:
 
 ```text
-RUN_ID = 37318728940
-ARTIFACT_ID = 11349546661
+RUN_ID = 37320470570
+UNIT_ARTIFACT = 11348779979
+BROWSER_ARTIFACT = 11350695612
 RESULT = PASS
 ```
 
-## Proven
+## Proven adapter behavior
 
-### Browser persistence
+- GitHub App authorization URL;
+- state validation architecture;
+- PKCE;
+- sealed short-lived admin session;
+- Browser receives no raw GitHub token;
+- exact Admin origin guard;
+- login/session capture in Editor;
+- Bearer Admin API calls;
+- logout;
+- fixed bundle → file mapping;
+- single atomic Git tree commit;
+- stale HEAD conflict;
+- invalid module/path rejection;
+- no force branch update.
 
-- IndexedDB autosave;
-- draft survives browser restart;
-- manual revision snapshots;
-- revision restore;
-- repository-sync state persisted;
-- post-commit state clears pending flag.
-
-### Editor
-
-- Site Settings;
-- page width inheritance/override;
-- 500 / 540 / custom width;
-- module add/delete;
-- drag reorder;
-- content editing;
-- true 1440 / 1024 / 390 preview;
-- JSON import/export.
-
-### Admin API boundary
-
-- authenticated status contract;
-- commit request contract;
-- fixed bundle → file allow-list;
-- exact HEAD / baseRevision behavior;
-- stale revision conflict;
-- invalid module/path rejection.
-
-Mock backend validation:
+## Not yet claimed
 
 ```text
-commit flow = PASS
-allow-list mapping = PASS
-409 stale HEAD = PASS
-422 invalid module/path = PASS
+REAL_GITHUB_APP_REGISTERED = NO
+REAL_GITHUB_SECRET_CONFIGURED = NO
+SERVERLESS_ADAPTER_DEPLOYED = NO
+REAL_SITE_REPO_COMMIT = NO
+GITHUB_PAGES_PUBLIC_DEPLOYMENT = NO
 ```
 
-## Important boundary
+## Current checkpoint
 
-The mock backend proves the production contract but does not write GitHub.
+The next step crosses from Factory code into external account/security configuration.
 
-Not yet configured:
+Required USER-side choices/actions:
 
-- real GitHub sign-in;
-- GitHub App / OAuth credentials;
-- serverless persistence deployment;
-- real repository commit;
-- public GitHub Pages deployment.
+1. choose/create a dedicated test Site Repo;
+2. register the GitHub App;
+3. install it only on that Repo;
+4. provide/configure the resulting Client ID / Client Secret on the serverless host;
+5. authorize deployment of the Admin API backend.
 
-No GitHub secret is stored in browser code.
+Do not use `WEB-Design-Lab` as the first real-write target.
 
-## Next
-
-Next Factory task:
-
-```text
-REAL GITHUB ADAPTER
-→ GitHub App / OAuth configuration
-→ server-side commit implementation
-→ real private test commit
-→ deployment pipeline
-```
-
-The next step reaches an account/security boundary: a GitHub App or equivalent authenticated backend must be configured before a real repository write can be proven.
-
-Public deployment remains a USER checkpoint and is not authorized by this work order.
+Public site deployment remains a separate USER checkpoint.
