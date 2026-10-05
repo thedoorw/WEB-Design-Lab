@@ -32,14 +32,15 @@ await page.locator('#login-github').click();
 await page.waitForFunction(()=>document.querySelector('#api-status')?.textContent?.includes('Authenticated: yes'));
 
 const session=await page.evaluate(()=>sessionStorage.getItem('webDesignLab.adminSession.v0.1'));
+const currentHash=await page.evaluate(()=>location.hash);
 record(
   'callback-session-captured',
   session==='qa-session' &&
-    !location.hash.includes('admin_session') &&
+    !currentHash.includes('admin_session') &&
     (await page.locator('#login-github').isDisabled()) &&
     !(await page.locator('#logout-github').isDisabled()) &&
     !(await page.locator('#save-github').isDisabled()),
-  {session,hash:await page.evaluate(()=>location.hash)}
+  {session,hash:currentHash}
 );
 
 // Commit must succeed only because the API client supplied Bearer qa-session.
