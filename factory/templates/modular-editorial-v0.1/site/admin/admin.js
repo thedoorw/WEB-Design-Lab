@@ -110,6 +110,7 @@ async function restoreDraft(){
     if(record && validDraft(record.bundle)){
       lastLocalSave=record.updatedAt || null;
       restoredFromPersistentDraft=true;
+      dirty=record.repositorySynced !== true;
       return record.bundle;
     }
   }catch(error){
@@ -121,7 +122,11 @@ async function restoreDraft(){
 async function persistLocal(reason='autosave'){
   if(!draft) return null;
   try{
-    const saved=await saveDraft(siteId,draft,{reason});
+    const saved=await saveDraft(siteId,draft,{
+      reason,
+      repositorySynced:!dirty,
+      repositoryHead:apiState?.head || null
+    });
     lastLocalSave=saved.updatedAt;
     renderPersistenceStatus();
     return saved;
@@ -727,6 +732,7 @@ async function init(){
         dirty=false;
         sourceBundle=deepClone(draft);
         apiState={...apiState,head:result.commitSha || apiState.head};
+        await persistLocal('post-commit');
         els.apiStatus.textContent=[
           'Admin API: connected',
           'Authenticated: yes',
