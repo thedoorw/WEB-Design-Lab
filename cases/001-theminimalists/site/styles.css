@@ -151,6 +151,7 @@ h4{font-size:14px;margin-bottom:.35rem;font-weight:700}
   .entry{margin-bottom:100px}
   .entry.featured-entry{margin-bottom:589px}
   .entry.has-thumb{display:block;min-height:568px;margin-bottom:100px}
+  .featured-entry + .entry.has-thumb{margin-bottom:100px}
   .entry.has-thumb h2{font-size:20.875px;line-height:20.875px}
   .entry.has-thumb:last-of-type{min-height:260px;margin-bottom:0}
   .entry-thumb{display:none}
