@@ -1,4 +1,14 @@
-const DRAFT_KEY='webDesignLab.modularDraft.v0.1';
+import {
+  loadDraft,
+  saveDraft,
+  clearDraft,
+  createRevision,
+  listRevisions,
+  getRevision,
+  pruneRevisions
+} from './draft-store.js';
+import {AdminApiClient} from './admin-api.js';
+
 const CONFIG_ROOT='../config/';
 
 const els={
@@ -28,7 +38,15 @@ const els={
   resetSource:document.querySelector('#reset-source'),
   exportBundle:document.querySelector('#export-bundle'),
   copyBundle:document.querySelector('#copy-bundle'),
-  importBundle:document.querySelector('#import-bundle')
+  importBundle:document.querySelector('#import-bundle'),
+  saveLocal:document.querySelector('#save-local'),
+  snapshotDraft:document.querySelector('#snapshot-draft'),
+  saveGithub:document.querySelector('#save-github'),
+  localStatus:document.querySelector('#local-status'),
+  revisionSelect:document.querySelector('#revision-select'),
+  restoreRevision:document.querySelector('#restore-revision'),
+  apiStatus:document.querySelector('#api-status'),
+  commitMessage:document.querySelector('#commit-message')
 };
 
 const moduleTypes=[
@@ -42,6 +60,13 @@ let currentPageId='home';
 let selectedModuleIndex=0;
 let dirty=false;
 let dragIndex=null;
+let adminConfig=null;
+let siteId='modular-editorial-v0.1';
+let apiClient=null;
+let apiState=null;
+let autosaveTimer=null;
+let lastLocalSave=null;
+let restoredFromPersistentDraft=false;
 
 const deepClone=value=>JSON.parse(JSON.stringify(value));
 
@@ -71,12 +96,104 @@ function validDraft(value){
     value.content?.projects?.items;
 }
 
-function restoreDraft(){
+async function loadAdminConfig(){
   try{
-    const raw=sessionStorage.getItem(DRAFT_KEY);
-    const parsed=raw ? JSON.parse(raw) : null;
-    return validDraft(parsed) ? parsed : null;
+    return await getJSON('./admin-config.json');
   }catch{
+    return {siteId:'modular-editorial-v0.1',persistence:{apiBase:'',repository:'',branch:'main'}};
+  }
+}
+
+async function restoreDraft(){
+  try{
+    const record=await loadDraft(siteId);
+    if(record && validDraft(record.bundle)){
+      lastLocalSave=record.updatedAt || null;
+      restoredFromPersistentDraft=true;
+      return record.bundle;
+    }
+  }catch(error){
+    console.warn('IndexedDB draft restore failed',error);
+  }
+  return null;
+}
+
+async function persistLocal(reason='autosave'){
+  if(!draft) return null;
+  try{
+    const saved=await saveDraft(siteId,draft,{reason});
+    lastLocalSave=saved.updatedAt;
+    renderPersistenceStatus();
+    return saved;
+  }catch(error){
+    console.error(error);
+    setStatus('Local draft save failed');
+    return null;
+  }
+}
+
+function schedulePersist(reason='autosave'){
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(()=>persistLocal(reason),180);
+}
+
+async function refreshRevisions(){
+  const revisions=await listRevisions(siteId,20);
+  els.revisionSelect.replaceChildren();
+  if(!revisions.length){
+    const option=document.createElement('option');
+    option.value='';
+    option.textContent='No snapshots yet';
+    els.revisionSelect.append(option);
+    els.restoreRevision.disabled=true;
+    return revisions;
+  }
+
+  for(const revision of revisions){
+    const option=document.createElement('option');
+    option.value=String(revision.id);
+    const label=revision.label || revision.reason || 'Snapshot';
+    option.textContent=`${new Date(revision.createdAt).toLocaleString()} · ${label}`;
+    els.revisionSelect.append(option);
+  }
+  els.restoreRevision.disabled=false;
+  return revisions;
+}
+
+function renderPersistenceStatus(){
+  els.localStatus.textContent=[
+    'Local persistence: IndexedDB',
+    `Site ID: ${siteId}`,
+    `Last local save: ${lastLocalSave ? new Date(lastLocalSave).toLocaleString() : 'not yet'}`,
+    `Repository state: ${dirty ? 'draft differs from source' : 'source/reset state'}`
+  ].join('\n');
+}
+
+async function refreshApiStatus(){
+  if(!apiClient?.configured){
+    apiState=null;
+    els.apiStatus.textContent='Admin API: not configured';
+    els.saveGithub.disabled=true;
+    return null;
+  }
+
+  try{
+    apiState=await apiClient.status();
+    const user=apiState.user?.login || 'unknown user';
+    els.apiStatus.textContent=[
+      'Admin API: connected',
+      `Authenticated: ${apiState.authenticated ? 'yes' : 'no'}`,
+      `User: ${user}`,
+      `Repository: ${apiState.repository || 'not reported'}`,
+      `Branch: ${apiState.branch || 'not reported'}`,
+      `Head: ${apiState.head || 'not reported'}`
+    ].join('\n');
+    els.saveGithub.disabled=!apiState.authenticated;
+    return apiState;
+  }catch(error){
+    apiState=null;
+    els.apiStatus.textContent=`Admin API: unavailable\n${error.message}`;
+    els.saveGithub.disabled=true;
     return null;
   }
 }
@@ -91,7 +208,7 @@ function markDirty(reason='Draft changed'){
 }
 
 function saveSession(){
-  sessionStorage.setItem(DRAFT_KEY,JSON.stringify(draft));
+  schedulePersist('autosave');
 }
 
 function currentPage(){
@@ -441,8 +558,13 @@ function download(name,text){
 async function init(){
   try{
     setStatus('Loading source…');
+    adminConfig=await loadAdminConfig();
+    siteId=adminConfig.siteId || 'modular-editorial-v0.1';
+    const apiOverride=new URLSearchParams(location.search).get('apiBase');
+    apiClient=new AdminApiClient(apiOverride || adminConfig.persistence?.apiBase || '');
+
     sourceBundle=await loadSourceBundle();
-    draft=restoreDraft() || deepClone(sourceBundle);
+    draft=await restoreDraft() || deepClone(sourceBundle);
 
     for(const type of moduleTypes){
       const option=document.createElement('option');
@@ -453,6 +575,9 @@ async function init(){
 
     renderAll();
     bindSimpleInputs();
+    renderPersistenceStatus();
+    await refreshRevisions();
+    await refreshApiStatus();
 
     els.pageSelect.addEventListener('change',()=>{
       currentPageId=els.pageSelect.value;
@@ -508,10 +633,13 @@ async function init(){
       dirty=false;
       currentPageId='home';
       selectedModuleIndex=0;
-      saveSession();
+      await clearDraft(siteId);
+      lastLocalSave=null;
       renderAll();
+      renderPersistenceStatus();
+      await refreshRevisions();
       setPreviewPage();
-      setStatus('Reset to repository source · not written to GitHub');
+      setStatus('Reset to repository source · local draft cleared');
     });
 
     els.exportBundle.addEventListener('click',()=>{
@@ -535,9 +663,9 @@ async function init(){
         currentPageId=Object.keys(draft.pages)[0]||'home';
         selectedModuleIndex=0;
         renderAll();
-        saveSession();
+        await persistLocal('import');
         setPreviewPage();
-        setStatus('Imported bundle · not written to GitHub');
+        setStatus('Imported bundle · saved locally');
       }catch(error){
         alert(String(error));
       }finally{
@@ -553,13 +681,79 @@ async function init(){
       });
     });
 
+    els.saveLocal.addEventListener('click',async()=>{
+      await persistLocal('manual-save');
+      setStatus('Draft saved locally');
+    });
+
+    els.snapshotDraft.addEventListener('click',async()=>{
+      const label=prompt('Snapshot label','Manual snapshot');
+      if(label===null) return;
+      await persistLocal('snapshot');
+      await createRevision(siteId,draft,{label:label || 'Manual snapshot',reason:'manual-snapshot'});
+      await pruneRevisions(siteId,20);
+      await refreshRevisions();
+      setStatus('Snapshot created');
+    });
+
+    els.restoreRevision.addEventListener('click',async()=>{
+      const id=els.revisionSelect.value;
+      if(!id) return;
+      const revision=await getRevision(id);
+      if(!revision || !validDraft(revision.bundle)) return;
+      draft=deepClone(revision.bundle);
+      dirty=true;
+      currentPageId=Object.keys(draft.pages)[0] || 'home';
+      selectedModuleIndex=0;
+      renderAll();
+      await persistLocal('restore-revision');
+      setPreviewPage();
+      setStatus(`Restored snapshot #${id} · saved locally`);
+    });
+
+    els.saveGithub.addEventListener('click',async()=>{
+      if(!apiClient?.configured || !apiState?.authenticated) return;
+      const message=els.commitMessage.value.trim() || 'Update modular site';
+      els.saveGithub.disabled=true;
+      setStatus('Saving through Admin API…');
+      try{
+        await persistLocal('pre-commit');
+        const result=await apiClient.commit({
+          siteId,
+          bundle:draft,
+          message,
+          baseRevision:apiState.head || null
+        });
+        dirty=false;
+        sourceBundle=deepClone(draft);
+        apiState={...apiState,head:result.commitSha || apiState.head};
+        els.apiStatus.textContent=[
+          'Admin API: connected',
+          'Authenticated: yes',
+          `Repository: ${apiState.repository || 'not reported'}`,
+          `Branch: ${result.branch || apiState.branch || 'not reported'}`,
+          `Head: ${apiState.head || 'not reported'}`,
+          `Changed files: ${(result.changedFiles || []).length}`
+        ].join('\n');
+        renderPersistenceStatus();
+        updateSummary();
+        setStatus(`Repository commit created: ${result.commitSha || 'unknown'}`);
+      }catch(error){
+        setStatus(`Repository save failed: ${error.message}`);
+      }finally{
+        els.saveGithub.disabled=!apiState?.authenticated;
+      }
+    });
+
     els.preview.addEventListener('load',()=>{
       syncPreview();
     });
 
-    saveSession();
+    if(!restoredFromPersistentDraft){
+      await persistLocal('initial-source');
+    }
     setPreviewPage();
-    setStatus(restoreDraft() ? 'Session draft loaded · not written to GitHub' : 'Source loaded · not written to GitHub');
+    setStatus(restoredFromPersistentDraft ? 'Persistent local draft restored' : 'Repository source loaded · local draft initialized');
   }catch(error){
     console.error(error);
     setStatus('Editor failed to load');
