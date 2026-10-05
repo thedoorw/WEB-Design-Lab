@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modular Editor v0.1</title>
+<link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+<header class="editor-topbar">
+  <div>
+    <strong>Modular Editor v0.1</strong>
+    <span class="editor-status" id="status">Loading…</span>
+  </div>
+  <div class="topbar-actions">
+    <button type="button" id="reset-source">Reset to source</button>
+    <button type="button" id="export-bundle">Export JSON bundle</button>
+  </div>
+</header>
+
+<div class="editor-layout">
+  <aside class="editor-sidebar">
+    <section class="panel">
+      <h2>Page</h2>
+      <label>
+        Editing page
+        <select id="page-select"></select>
+      </label>
+      <label>
+        Page title
+        <input id="page-title" type="text">
+      </label>
+      <div class="inline-field">
+        <label class="checkbox-label">
+          <input id="page-width-inherit" type="checkbox">
+          Inherit site width
+        </label>
+        <label>
+          Page width
+          <input id="page-width" type="number" min="280" max="1600" step="1">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Site settings</h2>
+      <label>
+        Site name
+        <input id="site-name" type="text">
+      </label>
+      <label>
+        Tagline
+        <input id="site-tagline" type="text">
+      </label>
+      <div class="two-col">
+        <label>
+          Default width
+          <input id="site-width" type="number" min="280" max="1600" step="1">
+        </label>
+        <label>
+          Mobile width
+          <input id="mobile-width" type="number" min="240" max="600" step="1">
+        </label>
+      </div>
+      <div class="two-col">
+        <label>
+          Display px
+          <input id="display-size" type="number" min="18" max="96" step="1">
+        </label>
+        <label>
+          Entry title px
+          <input id="entry-size" type="number" min="14" max="72" step="1">
+        </label>
+      </div>
+      <div class="two-col">
+        <label>
+          Page color
+          <input id="page-color" type="color">
+        </label>
+        <label>
+          Ink color
+          <input id="ink-color" type="color">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel module-panel">
+      <div class="panel-heading">
+        <h2>Modules</h2>
+        <span class="hint">Drag to reorder</span>
+      </div>
+      <div id="module-list" class="module-list"></div>
+
+      <div class="add-module-row">
+        <select id="add-module-type"></select>
+        <button type="button" id="add-module">Add module</button>
+      </div>
+
+      <label>
+        Selected module JSON
+        <textarea id="module-json" rows="10" spellcheck="false"></textarea>
+      </label>
+      <button type="button" id="apply-module-json">Apply module JSON</button>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <h2>Content</h2>
+        <button type="button" id="add-project">Add project</button>
+      </div>
+      <div id="project-list" class="project-list"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Draft bundle</h2>
+      <p class="hint">This version is local/session-only. Export before closing if you want to keep the draft.</p>
+      <label class="file-label">
+        Import JSON bundle
+        <input id="import-bundle" type="file" accept="application/json,.json">
+      </label>
+      <button type="button" id="copy-bundle">Copy bundle JSON</button>
+      <pre id="bundle-summary" class="bundle-summary"></pre>
+    </section>
+  </aside>
+
+  <main class="preview-area">
+    <div class="preview-toolbar">
+      <strong>Live preview</strong>
+      <div class="viewport-buttons" role="group" aria-label="Preview viewport">
+        <button type="button" data-width="1440" class="active">Desktop</button>
+        <button type="button" data-width="1024">Compact</button>
+        <button type="button" data-width="390">Mobile</button>
+      </div>
+    </div>
+    <div class="preview-scroll">
+      <div class="preview-shell" id="preview-shell" style="--preview-width:1440px">
+        <iframe id="preview" title="Live site preview"></iframe>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="./admin.js"></script>
+</body>
+</html>

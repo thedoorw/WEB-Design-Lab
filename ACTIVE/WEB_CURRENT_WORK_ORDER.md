@@ -2,45 +2,31 @@
 
 ROLE = WEB Factory / WR
 PROGRAM = WEB-Design-Lab
-STATUS = MODULAR_FACTORY_v0.1_PASS
+STATUS = MODULAR_EDITOR_v0.1_PASS
 USER_FIDELITY_GATE_REQUIRED = NO
 
-## Completed
+## Completed chain
+
+```text
+Case 001 reproduction
+→ editorial starter
+→ modular architecture
+→ modular editor
+```
 
 ### Case 001
 
 The Minimalists reproduction method:
-- reference classification;
 - synthetic-content reconstruction;
-- frozen visual baseline;
-- automatic comparison;
-- responsive correction;
+- frozen baseline;
+- automatic responsive comparison;
 - PASS.
-
-### Editorial starter
-
-`factory/templates/editorial-shell-v0.1/`
-
-Smoke QA:
-`PASS`
 
 ### Modular architecture
 
 `factory/templates/modular-editorial-v0.1/`
 
-Architecture:
-`factory/MODULAR_SITE_ARCHITECTURE_v0.1.md`
-
-QA:
-`factory/templates/modular-editorial-v0.1/QA.md`
-
-GitHub Actions:
-`RUN_ID = 37315358965`
-
-Result:
-`PASS`
-
-## Proven model
+Proven model:
 
 ```text
 Site Settings
@@ -51,58 +37,78 @@ Site Settings
 = Rendered Website
 ```
 
-Verified configuration behavior:
+### Modular Editor v0.1
+
+Implementation:
+
+`factory/templates/modular-editorial-v0.1/site/admin/`
+
+Specification:
+
+`factory/MODULAR_EDITOR_v0.1.md`
+
+QA:
+
+`factory/templates/modular-editorial-v0.1/EDITOR_QA.md`
+
+GitHub Actions:
 
 ```text
-SITE DEFAULT WIDTH = 540px
-HOME PAGE OVERRIDE = 500px
-MOBILE WIDTH = 330px
-SETTINGS PREVIEW 500 ↔ 540 = PASS
+RUN_ID = 37317054754
+ARTIFACT_ID = 11347414828
+RESULT = PASS
 ```
 
-## Current module registry
+## Proven Editor behavior
 
-- promo
-- introSplit
-- featuredEntry
-- entryStream
-- richText
-- archiveList
-- spacer
-- pagination
+- site settings editing;
+- page settings / inherit / override;
+- 500 / 540 / custom width control;
+- exact 1440 / 1024 / 390 preview viewports;
+- page recipe switching;
+- module add/delete;
+- drag reorder;
+- button reorder fallback;
+- module JSON edit;
+- project/content editing;
+- session draft;
+- import/export JSON bundle;
+- reset to repository source;
+- live preview through production runtime.
 
-## Production principle
+Regression:
 
-A website reproduction should no longer terminate at copied appearance.
+`MODULAR_EDITORIAL = PASS`
 
-It should extract reusable:
-- settings;
-- shell;
-- page recipes;
-- modules;
-- content structure.
+Errors:
 
-## Future admin boundary
+```text
+page = 0
+module = 0
+boot = 0
+```
 
-A later `/admin/` may edit the JSON/config layer:
-- site settings;
-- page overrides;
-- module order;
-- module parameters;
-- content data.
+## Current persistence boundary
 
-Authentication and GitHub-write persistence are separate future work.
+Editor v0.1 is intentionally local/session-only.
+
+It does not:
+- authenticate;
+- write to GitHub;
+- store credentials;
+- deploy Pages.
 
 ## Next
 
-Next logical Factory step:
+Next logical Factory task:
 
 ```text
-MODULAR EDITOR
-→ persistent admin data model
-→ GitHub write/auth boundary
+PERSISTENT ADMIN DATA MODEL
+→ GitHub authentication/write boundary
+→ validated commit
+→ automated deployment
 ```
 
-or create the first formal Site Repo using `modular-editorial-v0.1`.
+Before public deployment, USER remains the checkpoint for visibility/deployment decisions.
 
 No Pages deployment is authorized by this work order.

@@ -1,6 +1,9 @@
 const root = document.documentElement.dataset.siteRoot || './';
-const pageId = document.documentElement.dataset.page || 'home';
+const params = new URLSearchParams(location.search);
+const previewAdmin = params.get('preview') === 'admin';
+let currentPageId = params.get('page') || document.documentElement.dataset.page || 'home';
 const app = document.querySelector('#app');
+const DRAFT_KEY = 'webDesignLab.modularDraft.v0.1';
 
 const join = (path) => `${root}${path}`;
 
@@ -214,31 +217,85 @@ function renderPage(page,ctx){
   return fragment;
 }
 
+function renderBundle(bundle,pageId=currentPageId){
+  const site=bundle.site;
+  const page=bundle.pages?.[pageId];
+  const projectsData=bundle.content?.projects;
+  if(!site) throw new Error('Draft bundle is missing site');
+  if(!page) throw new Error(`Draft bundle is missing page: ${pageId}`);
+  if(!projectsData) throw new Error('Draft bundle is missing content.projects');
+
+  currentPageId=pageId;
+  document.title = page.title || site.identity.name;
+  const settings=applySettings(site.settings,page.settings);
+  document.documentElement.dataset.contentWidth=String(settings.contentWidth);
+  document.documentElement.dataset.renderedPage=pageId;
+
+  app.replaceChildren(renderPage(page,{
+    site,
+    page,
+    projects:projectMap(projectsData),
+    settings
+  }));
+}
+
+function readDraft(){
+  if(!previewAdmin) return null;
+  try{
+    const raw=sessionStorage.getItem(DRAFT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(error){
+    console.warn('Invalid admin draft',error);
+    return null;
+  }
+}
+
+async function loadFileBundle(pageId=currentPageId){
+  const site=await getJSON('config/site.json');
+  const pagePath=site.pages?.[pageId];
+  if(!pagePath) throw new Error(`Unknown page id: ${pageId}`);
+  const [page,projectsData]=await Promise.all([
+    getJSON(pagePath),
+    getJSON(site.content.projects)
+  ]);
+
+  return {
+    site,
+    pages:{[pageId]:page},
+    content:{projects:projectsData}
+  };
+}
+
 async function boot(){
   try{
-    const site=await getJSON('config/site.json');
-    const pagePath=site.pages?.[pageId];
-    if(!pagePath) throw new Error(`Unknown page id: ${pageId}`);
-    const [page,projectsData]=await Promise.all([
-      getJSON(pagePath),
-      getJSON(site.content.projects)
-    ]);
+    const draft=readDraft();
+    if(draft){
+      document.documentElement.dataset.previewDraft='true';
+      renderBundle(draft,currentPageId);
+      return;
+    }
 
-    document.title = page.title || site.identity.name;
-    const settings=applySettings(site.settings,page.settings);
-    document.documentElement.dataset.contentWidth=String(settings.contentWidth);
-
-    app.replaceChildren(renderPage(page,{
-      site,
-      page,
-      projects:projectMap(projectsData),
-      settings
-    }));
+    const bundle=await loadFileBundle(currentPageId);
+    renderBundle(bundle,currentPageId);
   }catch(error){
     console.error(error);
     app.replaceChildren(el('pre','boot-error',String(error)));
     document.documentElement.dataset.bootError='true';
   }
 }
+
+window.addEventListener('message',(event)=>{
+  if(!previewAdmin || event.origin !== location.origin) return;
+  if(event.data?.type !== 'MODULAR_EDITOR_DRAFT') return;
+  try{
+    const nextPage=event.data.pageId || currentPageId;
+    renderBundle(event.data.bundle,nextPage);
+    document.documentElement.dataset.previewDraft='true';
+  }catch(error){
+    console.error(error);
+    app.replaceChildren(el('pre','boot-error',String(error)));
+    document.documentElement.dataset.bootError='true';
+  }
+});
 
 boot();
