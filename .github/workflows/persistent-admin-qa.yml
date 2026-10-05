@@ -1,0 +1,61 @@
+name: Persistent Admin QA
+
+on:
+  push:
+    branches:
+      - work/persistent-admin-v0.2
+    paths:
+      - 'factory/templates/modular-editorial-v0.1/**'
+      - 'factory/persistence/**'
+      - 'factory/capture/persistent-admin-qa.mjs'
+      - 'factory/capture/modular-editorial-qa.mjs'
+      - '.github/workflows/persistent-admin-qa.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: persistent-admin-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start mock persistence server
+        run: |
+          node factory/persistence/mock-admin-server.mjs > /tmp/mock-admin.log 2>&1 &
+          echo $! > /tmp/mock-admin.pid
+          sleep 2
+          curl --fail http://127.0.0.1:4173/api/admin/status > /dev/null
+          curl --fail http://127.0.0.1:4173/factory/templates/modular-editorial-v0.1/site/admin/ > /dev/null
+
+      - name: Regression QA — modular site
+        env:
+          MODULAR_BASE: http://127.0.0.1:4173/factory/templates/modular-editorial-v0.1/site/
+        run: node factory/capture/modular-editorial-qa.mjs
+
+      - name: Persistent admin QA
+        env:
+          MODULAR_BASE: http://127.0.0.1:4173/factory/templates/modular-editorial-v0.1/site/
+        run: node factory/capture/persistent-admin-qa.mjs
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: persistent-admin-qa
+          path: |
+            artifacts/modular-editorial/
+            artifacts/persistent-admin/
+          if-no-files-found: error
