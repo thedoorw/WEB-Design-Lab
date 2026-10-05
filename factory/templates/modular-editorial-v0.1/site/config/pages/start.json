@@ -1,0 +1,28 @@
+{
+  "id": "start",
+  "title": "Start",
+  "settings": {
+    "contentWidth": 540
+  },
+  "modules": [
+    {
+      "type": "richText",
+      "heading": "Start Here",
+      "blocks": [
+        {"type": "p", "text": "This page uses the site default 540px width and is assembled from structured content blocks."},
+        {"type": "h2", "text": "One system, different pages"},
+        {"type": "p", "text": "The shell remains shared while page recipes decide which modules appear and in what order."},
+        {"type": "h2", "text": "Why this matters"},
+        {"type": "p", "text": "A future editor can change page structure by editing data rather than rebuilding the document."}
+      ]
+    },
+    {
+      "type": "spacer",
+      "size": "large"
+    },
+    {
+      "type": "entryStream",
+      "projectIds": ["p002", "p003"]
+    }
+  ]
+}
