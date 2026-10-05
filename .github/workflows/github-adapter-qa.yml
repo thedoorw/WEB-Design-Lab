@@ -1,0 +1,84 @@
+name: GitHub App Adapter QA
+
+on:
+  push:
+    branches:
+      - work/github-app-adapter-v0.1
+    paths:
+      - 'factory/persistence/github-app-worker/**'
+      - 'factory/persistence/mock-admin-server.mjs'
+      - 'factory/templates/modular-editorial-v0.1/site/admin/**'
+      - 'factory/capture/github-adapter-qa.mjs'
+      - 'factory/capture/github-adapter-browser-qa.mjs'
+      - 'factory/capture/modular-editorial-qa.mjs'
+      - '.github/workflows/github-adapter-qa.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: github-app-adapter-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  adapter-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run adapter unit / contract QA
+        run: node factory/capture/github-adapter-qa.mjs
+
+      - name: Upload unit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-app-adapter-unit-qa
+          path: artifacts/github-adapter/
+          if-no-files-found: error
+
+  editor-session:
+    needs: adapter-unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start session-aware mock Admin API
+        env:
+          SESSION_AUTH: '1'
+        run: |
+          node factory/persistence/mock-admin-server.mjs > /tmp/github-adapter-mock.log 2>&1 &
+          sleep 2
+          curl --fail http://127.0.0.1:4173/factory/templates/modular-editorial-v0.1/site/admin/ > /dev/null
+
+      - name: Modular runtime regression
+        env:
+          MODULAR_BASE: http://127.0.0.1:4173/factory/templates/modular-editorial-v0.1/site/
+        run: node factory/capture/modular-editorial-qa.mjs
+
+      - name: Editor GitHub-session QA
+        env:
+          MODULAR_BASE: http://127.0.0.1:4173/factory/templates/modular-editorial-v0.1/site/
+        run: node factory/capture/github-adapter-browser-qa.mjs
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-app-adapter-browser-qa
+          path: |
+            artifacts/modular-editorial/
+            artifacts/github-adapter-browser/
+          if-no-files-found: error

@@ -1,0 +1,19 @@
+name = "web-design-lab-admin"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+# Example only. Do not commit real secrets.
+[vars]
+ADMIN_ORIGIN = "https://YOUR-GITHUB-PAGES-ORIGIN"
+PUBLIC_BASE_URL = "https://YOUR-WORKER.example.workers.dev"
+GITHUB_CALLBACK_URL = "https://YOUR-WORKER.example.workers.dev/api/admin/callback"
+GITHUB_REPOSITORY = "OWNER/SITE-REPO"
+GITHUB_REPOSITORY_ID = "123456789"
+GITHUB_BRANCH = "main"
+GITHUB_APP_CLIENT_ID = "Iv1.EXAMPLE"
+ADMIN_GITHUB_LOGIN = "YOUR_GITHUB_LOGIN"
+SITE_ID = "modular-editorial-v0.1"
+
+# Configure as secrets in the serverless environment:
+# GITHUB_APP_CLIENT_SECRET
+# SESSION_SECRET

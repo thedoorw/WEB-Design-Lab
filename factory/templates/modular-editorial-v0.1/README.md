@@ -105,7 +105,13 @@ Repository persistence is separated behind:
 
 The included mock backend proves validation, conflict detection and allow-listed bundle-to-file mapping.
 
-It does not claim a real GitHub commit.
+A real GitHub App adapter is also implemented at:
+
+`factory/persistence/github-app-worker/`
+
+The Editor now supports Login with GitHub / encrypted admin-session capture / Bearer API calls / Logout when a real Admin API is configured.
+
+The adapter code and offline/browser integration tests pass, but a real GitHub commit still requires GitHub App registration, a dedicated Site Repo, serverless deployment and account-side secrets.
 
 See:
 

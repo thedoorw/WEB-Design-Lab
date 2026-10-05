@@ -10,6 +10,8 @@ const allowedModules=new Set([
   'richText','archiveList','spacer','pagination'
 ]);
 const allowedPages=['home','start','archive'];
+const sessionAuth=process.env.SESSION_AUTH==='1';
+const qaSession='qa-session';
 
 let head='mock-head-001';
 let lastCommit=null;
@@ -89,8 +91,21 @@ function safeFile(urlPath){
 
 const server=http.createServer(async (req,res)=>{
   const url=new URL(req.url,'http://127.0.0.1');
+  const authenticated=!sessionAuth || req.headers.authorization===`Bearer ${qaSession}`;
+
+  if(url.pathname==='/api/admin/login' && req.method==='GET' && sessionAuth){
+    const returnTo=url.searchParams.get('return_to');
+    if(!returnTo) return json(res,400,{ok:false,error:'RETURN_TO_REQUIRED'});
+    const target=new URL(returnTo);
+    target.hash=new URLSearchParams({admin_session:qaSession}).toString();
+    res.writeHead(302,{Location:target.toString()});
+    return res.end();
+  }
 
   if(url.pathname==='/api/admin/status' && req.method==='GET'){
+    if(!authenticated){
+      return json(res,200,{ok:true,authenticated:false});
+    }
     return json(res,200,{
       ok:true,
       authenticated:true,
@@ -102,6 +117,7 @@ const server=http.createServer(async (req,res)=>{
   }
 
   if(url.pathname==='/api/admin/commit' && req.method==='POST'){
+    if(!authenticated) return json(res,401,{ok:false,error:'UNAUTHENTICATED'});
     let body;
     try{ body=await readBody(req); }
     catch{ return json(res,400,{ok:false,error:'INVALID_JSON'}); }
