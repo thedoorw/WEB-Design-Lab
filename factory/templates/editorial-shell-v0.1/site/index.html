@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Site Name</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="masthead shell">
+    <a class="brand" href="./">SITE NAME</a>
+    <p class="tagline">work · process · notes</p>
+  </div>
+
+  <div class="nav-bar">
+    <div class="shell nav-row">
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="./">Home</a>
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#archive">Archive</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="promo">Optional short announcement or positioning line.</div>
+
+<section class="intro shell" id="about">
+  <div class="intro-media media-placeholder">Intro media</div>
+  <div class="intro-copy">
+    <p>A short description of the practice, archive, studio, or project. Keep this compact enough to behave as part of the site shell.</p>
+  </div>
+</section>
+
+<main class="reading" id="work">
+  <article class="entry featured">
+    <h1><a href="#">Featured Project Title</a></h1>
+    <p class="meta">Project · Year</p>
+    <div class="media-placeholder featured-media">Featured media</div>
+    <p>Short project summary. Use content density comparable to the intended production site.</p>
+    <a class="more" href="#">More +</a>
+  </article>
+
+  <article class="entry split">
+    <div>
+      <h2><a href="#">Project or Note Two</a></h2>
+      <p>Short description for a repeated editorial entry.</p>
+      <a class="more" href="#">More +</a>
+    </div>
+    <div class="media-placeholder thumb">Media</div>
+  </article>
+
+  <article class="entry split">
+    <div>
+      <h2><a href="#">Project or Note Three</a></h2>
+      <p>Short description for a repeated editorial entry.</p>
+      <a class="more" href="#">More +</a>
+    </div>
+    <div class="media-placeholder thumb">Media</div>
+  </article>
+
+  <nav class="pagination" id="archive" aria-label="Pagination">
+    <span>1 2 3</span>
+    <a href="#">Next Page</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-row">
+    <span>© Site Name</span>
+    <span><a href="#about">About</a> · <a href="#archive">Archive</a></span>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>
