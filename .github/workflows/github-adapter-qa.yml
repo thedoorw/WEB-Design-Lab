@@ -1,0 +1,36 @@
+name: GitHub App Adapter QA
+
+on:
+  push:
+    branches:
+      - work/github-app-adapter-v0.1
+    paths:
+      - 'factory/persistence/github-app-worker/**'
+      - 'factory/capture/github-adapter-qa.mjs'
+      - '.github/workflows/github-adapter-qa.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: github-app-adapter-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run adapter unit / contract QA
+        run: node factory/capture/github-adapter-qa.mjs
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-app-adapter-qa
+          path: artifacts/github-adapter/
+          if-no-files-found: error
