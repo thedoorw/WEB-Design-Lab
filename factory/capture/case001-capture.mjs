@@ -6,11 +6,17 @@ const localBase = process.env.LOCAL_BASE || 'http://127.0.0.1:4173/cases/001-the
 const outDir = process.env.OUT_DIR || 'artifacts/case001';
 fs.mkdirSync(outDir, { recursive: true });
 
-const targets = [
+const includeLiveReference = process.env.INCLUDE_LIVE_REFERENCE === '1';
+
+const liveReferenceTargets = [
   ['reference','home','https://www.theminimalists.com/'],
   ['reference','start','https://www.theminimalists.com/start/'],
   ['reference','resources','https://www.theminimalists.com/resources/'],
   ['reference','archives','https://www.theminimalists.com/archives/'],
+];
+
+const targets = [
+  ...(includeLiveReference ? liveReferenceTargets : []),
   ['theme','home','https://tru.spyr.me/'],
   ['local','home',localBase],
   ['local','start',localBase + 'start/'],
