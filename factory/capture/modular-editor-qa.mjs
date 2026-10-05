@@ -163,8 +163,6 @@ record(
 // Return to compact viewport for a useful evidence screenshot.
 await page.getByRole('button',{name:'Compact',exact:true}).click();
 await page.waitForFunction(()=>document.querySelector('#preview')?.contentWindow?.innerWidth===1024);
-document;
-
 await page.locator('.editor-sidebar').evaluate(el=>el.scrollTop=0);
 await page.screenshot({path:`${out}/editor-desktop.png`,fullPage:true});
 
