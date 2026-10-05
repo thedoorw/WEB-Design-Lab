@@ -627,7 +627,7 @@ async function init(){
       syncPreview();
     });
 
-    els.resetSource.addEventListener('click',()=>{
+    els.resetSource.addEventListener('click',async()=>{
       if(!confirm('Discard the current draft and reload repository source data?')) return;
       draft=deepClone(sourceBundle);
       dirty=false;
