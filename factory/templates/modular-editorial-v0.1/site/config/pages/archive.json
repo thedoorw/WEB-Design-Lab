@@ -1,0 +1,14 @@
+{
+  "id": "archive",
+  "title": "Archive",
+  "settings": {
+    "contentWidth": 540
+  },
+  "modules": [
+    {
+      "type": "archiveList",
+      "heading": "Archive",
+      "projectIds": ["p001", "p002", "p003", "p004"]
+    }
+  ]
+}
