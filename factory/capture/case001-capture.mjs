@@ -6,11 +6,16 @@ const localBase = process.env.LOCAL_BASE || 'http://127.0.0.1:4173/cases/001-the
 const outDir = process.env.OUT_DIR || 'artifacts/case001';
 fs.mkdirSync(outDir, { recursive: true });
 
-const pages = [
-  ['home', 'https://www.theminimalists.com/', localBase],
-  ['start', 'https://www.theminimalists.com/start/', localBase + 'start/'],
-  ['resources', 'https://www.theminimalists.com/resources/', localBase + 'resources/'],
-  ['archives', 'https://www.theminimalists.com/archives/', localBase + 'archives/'],
+const targets = [
+  ['reference','home','https://www.theminimalists.com/'],
+  ['reference','start','https://www.theminimalists.com/start/'],
+  ['reference','resources','https://www.theminimalists.com/resources/'],
+  ['reference','archives','https://www.theminimalists.com/archives/'],
+  ['theme','home','https://tru.spyr.me/'],
+  ['local','home',localBase],
+  ['local','start',localBase + 'start/'],
+  ['local','resources',localBase + 'resources/'],
+  ['local','archives',localBase + 'archives/'],
 ];
 
 const viewports = [
@@ -33,10 +38,12 @@ async function inspect(page) {
         x: Math.round(r.x), y: Math.round(r.y),
         width: Math.round(r.width), height: Math.round(r.height),
         fontSize: s.fontSize, lineHeight: s.lineHeight,
-        display: s.display, position: s.position
+        display: s.display, position: s.position,
+        marginTop: s.marginTop, marginBottom: s.marginBottom,
+        paddingLeft: s.paddingLeft, paddingRight: s.paddingRight
       };
     };
-    const bodyText = (document.body?.innerText || '').slice(0,1200);
+    const bodyText = (document.body?.innerText || '').slice(0,1600);
     const title = document.title;
     const challenge =
       /just a moment/i.test(title) ||
@@ -46,48 +53,54 @@ async function inspect(page) {
       challenge,
       body: {scrollWidth: document.body.scrollWidth, scrollHeight: document.body.scrollHeight},
       header: rect('header'),
+      siteHeader: rect('.site-header'),
       nav: rect('nav'),
+      firstNavList: rect('nav ul'),
       main: rect('main'),
+      content: rect('.content'),
+      siteInner: rect('.site-inner'),
       footer: rect('footer'),
       firstH1: rect('h1'),
       firstH2: rect('h2'),
       firstArticle: rect('article'),
-      linkCount: document.querySelectorAll('a').length
+      firstEntry: rect('.entry'),
+      firstImage: rect('img'),
+      firstForm: rect('form'),
+      linkCount: document.querySelectorAll('a').length,
+      articleCount: document.querySelectorAll('article').length
     };
   });
 }
 
 for (const [vpName,width,height] of viewports) {
-  for (const [name,refUrl,localUrl] of pages) {
-    for (const [kind,url] of [['reference',refUrl],['local',localUrl]]) {
-      const page = await browser.newPage({ viewport: {width,height} });
-      try {
-        await page.goto(url,{waitUntil:'domcontentloaded',timeout:45000});
-        await page.waitForTimeout(1800);
-        const metrics = await inspect(page);
-        const blocked = kind === 'reference' && metrics.challenge;
-        const shot = path.join(outDir, `${kind}-${name}-${vpName}-${width}x${height}.png`);
-        await page.screenshot({path:shot,fullPage:true});
-        report.push({
-          kind,name,viewport:vpName,width,height,url,
-          status: blocked ? 'BLOCKED_REFERENCE_CAPTURE' : 'CAPTURED',
-          metrics
-        });
-      } catch (e) {
-        report.push({kind,name,viewport:vpName,width,height,url,status:'ERROR',error:String(e)});
-      } finally {
-        await page.close();
-      }
+  for (const [kind,name,url] of targets) {
+    const page = await browser.newPage({ viewport: {width,height} });
+    try {
+      await page.goto(url,{waitUntil:'domcontentloaded',timeout:45000});
+      await page.waitForTimeout(1800);
+      const metrics = await inspect(page);
+      const blocked = kind === 'reference' && metrics.challenge;
+      const shot = path.join(outDir, `${kind}-${name}-${vpName}-${width}x${height}.png`);
+      await page.screenshot({path:shot,fullPage:true});
+      report.push({
+        kind,name,viewport:vpName,width,height,url,
+        status: blocked ? 'BLOCKED_REFERENCE_CAPTURE' : 'CAPTURED',
+        metrics
+      });
+    } catch (e) {
+      report.push({kind,name,viewport:vpName,width,height,url,status:'ERROR',error:String(e)});
+    } finally {
+      await page.close();
     }
   }
 }
 
 await browser.close();
-const reportPath = path.join(outDir,'metrics.json');
-fs.writeFileSync(reportPath, JSON.stringify(report,null,2));
+fs.writeFileSync(path.join(outDir,'metrics.json'), JSON.stringify(report,null,2));
 
 const summary = {
   localCaptured: report.filter(x => x.kind==='local' && x.status==='CAPTURED').length,
+  themeCaptured: report.filter(x => x.kind==='theme' && x.status==='CAPTURED').length,
   referenceCaptured: report.filter(x => x.kind==='reference' && x.status==='CAPTURED').length,
   referenceBlocked: report.filter(x => x.kind==='reference' && x.status==='BLOCKED_REFERENCE_CAPTURE').length,
   errors: report.filter(x => x.status==='ERROR').length
