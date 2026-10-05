@@ -1,0 +1,47 @@
+name: Modular Editorial QA
+
+on:
+  push:
+    branches:
+      - work/factory-modular-site-001
+    paths:
+      - 'factory/templates/modular-editorial-v0.1/**'
+      - 'factory/capture/modular-editorial-qa.mjs'
+      - '.github/workflows/modular-editorial-qa.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: modular-editorial-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/modular-editorial.log 2>&1 &
+          sleep 2
+          curl --fail http://127.0.0.1:4173/factory/templates/modular-editorial-v0.1/site/ > /dev/null
+
+      - name: Run modular QA
+        run: node factory/capture/modular-editorial-qa.mjs
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: modular-editorial-qa
+          path: artifacts/modular-editorial/
+          if-no-files-found: error
