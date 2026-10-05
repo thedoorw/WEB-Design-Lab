@@ -1,11 +1,11 @@
 # Modular Editorial Starter v0.1
 
-STATUS = ACTIVE DEVELOPMENT
+STATUS = MODULAR_EDITOR_v0.1_PASS
 DERIVED_FROM = editorial-shell-v0.1 + Case 001 lessons
 
 ## Purpose
 
-Turn website reproduction into reusable structure rather than copied HTML.
+Turn website reproduction into reusable, editable structure rather than copied HTML.
 
 ```text
 Site Settings
@@ -37,6 +37,10 @@ site/
 │  └─ index.html
 ├─ settings-preview/
 │  └─ index.html
+├─ admin/
+│  ├─ index.html
+│  ├─ admin.css
+│  └─ admin.js
 ├─ styles.css
 ├─ runtime.js
 └─ config/
@@ -54,20 +58,16 @@ site/
 ```text
 Site default
 → Page override
-→ temporary preview override
+→ temporary Editor override
 ```
 
 Example:
 
-```json
-site.json
-{ "contentWidth": 540 }
-
-home.json
-{ "settings": { "contentWidth": 500 } }
+```text
+site default = 540px
+home override = 500px
+mobile = 330px
 ```
-
-The home page renders at 500px while other pages remain 540px.
 
 ## Supported page modules
 
@@ -82,8 +82,33 @@ The home page renders at 500px while other pages remain 540px.
 
 The module registry lives in `runtime.js`.
 
-## Admin direction
+## Editor
 
-The JSON files are the content/config boundary for a future `/admin/` editor.
+Open:
 
-A later editor can update these data objects without rewriting page HTML.
+`site/admin/`
+
+Current Editor capabilities:
+- site settings;
+- per-page width override/inheritance;
+- page selection;
+- module add/delete;
+- drag reorder;
+- module JSON editing;
+- content/project editing;
+- live preview;
+- exact 1440 / 1024 / 390 viewport preview;
+- session draft;
+- reset;
+- JSON bundle import/export.
+
+The Editor does not yet write back to GitHub.
+
+See:
+`factory/MODULAR_EDITOR_v0.1.md`
+
+## Production boundary
+
+For routine publishing, a later authenticated persistence layer should commit validated config/content changes to a formal Site Repo.
+
+Do not expose GitHub credentials in static Pages JavaScript.
