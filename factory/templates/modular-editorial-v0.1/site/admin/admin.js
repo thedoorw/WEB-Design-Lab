@@ -170,7 +170,7 @@ function renderPersistenceStatus(){
     'Local persistence: IndexedDB',
     `Site ID: ${siteId}`,
     `Last local save: ${lastLocalSave ? new Date(lastLocalSave).toLocaleString() : 'not yet'}`,
-    `Repository state: ${dirty ? 'draft differs from source' : 'source/reset state'}`
+    `Repository sync: ${dirty ? 'local changes pending' : 'no local changes pending'}`
   ].join('\n');
 }
 
