@@ -36,8 +36,14 @@ async function inspect(page) {
         display: s.display, position: s.position
       };
     };
+    const bodyText = (document.body?.innerText || '').slice(0,1200);
+    const title = document.title;
+    const challenge =
+      /just a moment/i.test(title) ||
+      /security verification|verify you are human|checking your browser|cloudflare/i.test(bodyText);
     return {
-      title: document.title,
+      title,
+      challenge,
       body: {scrollWidth: document.body.scrollWidth, scrollHeight: document.body.scrollHeight},
       header: rect('header'),
       nav: rect('nav'),
@@ -55,17 +61,20 @@ for (const [vpName,width,height] of viewports) {
   for (const [name,refUrl,localUrl] of pages) {
     for (const [kind,url] of [['reference',refUrl],['local',localUrl]]) {
       const page = await browser.newPage({ viewport: {width,height} });
-      let error = null;
       try {
         await page.goto(url,{waitUntil:'domcontentloaded',timeout:45000});
         await page.waitForTimeout(1800);
         const metrics = await inspect(page);
+        const blocked = kind === 'reference' && metrics.challenge;
         const shot = path.join(outDir, `${kind}-${name}-${vpName}-${width}x${height}.png`);
         await page.screenshot({path:shot,fullPage:true});
-        report.push({kind,name,viewport:vpName,width,height,url,metrics});
+        report.push({
+          kind,name,viewport:vpName,width,height,url,
+          status: blocked ? 'BLOCKED_REFERENCE_CAPTURE' : 'CAPTURED',
+          metrics
+        });
       } catch (e) {
-        error = String(e);
-        report.push({kind,name,viewport:vpName,width,height,url,error});
+        report.push({kind,name,viewport:vpName,width,height,url,status:'ERROR',error:String(e)});
       } finally {
         await page.close();
       }
@@ -76,6 +85,15 @@ for (const [vpName,width,height] of viewports) {
 await browser.close();
 const reportPath = path.join(outDir,'metrics.json');
 fs.writeFileSync(reportPath, JSON.stringify(report,null,2));
+
+const summary = {
+  localCaptured: report.filter(x => x.kind==='local' && x.status==='CAPTURED').length,
+  referenceCaptured: report.filter(x => x.kind==='reference' && x.status==='CAPTURED').length,
+  referenceBlocked: report.filter(x => x.kind==='reference' && x.status==='BLOCKED_REFERENCE_CAPTURE').length,
+  errors: report.filter(x => x.status==='ERROR').length
+};
+fs.writeFileSync(path.join(outDir,'summary.json'), JSON.stringify(summary,null,2));
+console.log('CASE001_CAPTURE_SUMMARY', JSON.stringify(summary));
 console.log('CASE001_METRICS_START');
 console.log(JSON.stringify(report));
 console.log('CASE001_METRICS_END');
