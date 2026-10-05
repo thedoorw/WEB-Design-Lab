@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" data-site-root="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings Preview</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+.settings-panel{
+  width:min(calc(100% - 32px),760px);
+  margin:32px auto;
+  padding:20px;
+  border:1px solid var(--line);
+  font-family:Arial,Helvetica,sans-serif;
+}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.settings-panel label{display:grid;gap:6px;font-size:12px}
+.settings-panel select,.settings-panel input{font:inherit;padding:8px}
+.preview-frame{border:1px solid var(--line);margin-top:20px}
+.preview-stage{
+  width:min(calc(100% - 60px),var(--content-width));
+  margin:30px auto;
+  min-height:420px;
+}
+.preview-block{height:46px;background:var(--soft);margin-bottom:18px}
+.preview-title{font-size:var(--display-size);line-height:1;margin-bottom:18px}
+.preview-copy{line-height:1.55}
+.readout{font-family:monospace;font-size:12px;color:var(--muted);margin-top:12px}
+</style>
+</head>
+<body>
+<section class="settings-panel">
+  <h1>Settings Preview</h1>
+  <p>This is a non-persistent prototype for future admin controls.</p>
+
+  <div class="settings-grid">
+    <label>
+      Desktop content width
+      <select id="content-width">
+        <option value="500">500px</option>
+        <option value="540" selected>540px</option>
+        <option value="720">720px</option>
+        <option value="960">960px</option>
+      </select>
+    </label>
+
+    <label>
+      Mobile content width
+      <select id="mobile-width">
+        <option value="300">300px</option>
+        <option value="330" selected>330px</option>
+        <option value="350">350px</option>
+      </select>
+    </label>
+
+    <label>
+      Display size
+      <input id="display-size" type="number" min="20" max="72" value="32">
+    </label>
+  </div>
+
+  <div class="readout" id="readout"></div>
+
+  <div class="preview-frame">
+    <div class="preview-stage">
+      <div class="preview-title">A modular page preview</div>
+      <div class="preview-block"></div>
+      <p class="preview-copy">The page width is controlled by settings rather than hard-coded into the HTML document.</p>
+      <div class="preview-block"></div>
+      <div class="preview-block"></div>
+    </div>
+  </div>
+
+  <p><a href="../">Back to modular home</a></p>
+</section>
+
+<script>
+const cw=document.querySelector('#content-width');
+const mw=document.querySelector('#mobile-width');
+const ds=document.querySelector('#display-size');
+const readout=document.querySelector('#readout');
+
+function apply(){
+  document.documentElement.style.setProperty('--content-width',cw.value+'px');
+  document.documentElement.style.setProperty('--mobile-width',mw.value+'px');
+  document.documentElement.style.setProperty('--display-size',ds.value+'px');
+  readout.textContent='contentWidth='+cw.value+'px · mobileWidth='+mw.value+'px · display='+ds.value+'px';
+}
+[cw,mw,ds].forEach(el=>el.addEventListener('input',apply));
+apply();
+</script>
+</body>
+</html>
