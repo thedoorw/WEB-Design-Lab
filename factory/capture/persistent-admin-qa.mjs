@@ -62,10 +62,12 @@ await context.close();
 ({context,page,errors}=await openEditor());
 await page.waitForFunction(()=>document.querySelector('#site-name')?.value==='PERSISTENT TEST');
 const reopenStatus=await page.locator('#status').textContent();
+const reopenedLocalStatus=await page.locator('#local-status').textContent();
 record(
   'persists-across-browser-restart',
-  (await page.locator('#site-name').inputValue())==='PERSISTENT TEST',
-  {status:reopenStatus}
+  (await page.locator('#site-name').inputValue())==='PERSISTENT TEST' &&
+    reopenedLocalStatus.includes('local changes pending'),
+  {status:reopenStatus,localStatus:reopenedLocalStatus}
 );
 
 // Commit through the mock authenticated backend.
@@ -76,12 +78,14 @@ await page.waitForFunction(()=>document.querySelector('#status')?.textContent?.i
 const afterStatus=await fetch(apiBase+'/status').then(r=>r.json());
 const apiText=await page.locator('#api-status').textContent();
 
+const postCommitLocalStatus=await page.locator('#local-status').textContent();
 record(
   'backend-commit',
   beforeStatus.head!==afterStatus.head &&
     afterStatus.head.startsWith('mock-') &&
-    apiText.includes(afterStatus.head),
-  {beforeHead:beforeStatus.head,afterHead:afterStatus.head}
+    apiText.includes(afterStatus.head) &&
+    postCommitLocalStatus.includes('no local changes pending'),
+  {beforeHead:beforeStatus.head,afterHead:afterStatus.head,localStatus:postCommitLocalStatus}
 );
 
 const debug=await fetch('http://127.0.0.1:4173/api/admin/debug').then(r=>r.json());
