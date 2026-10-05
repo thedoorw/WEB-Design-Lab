@@ -67,7 +67,21 @@ async function inspect(page) {
       firstImage: rect('img'),
       firstForm: rect('form'),
       linkCount: document.querySelectorAll('a').length,
-      articleCount: document.querySelectorAll('article').length
+      articleCount: document.querySelectorAll('article').length,
+      headings: [...document.querySelectorAll('h2')].slice(0,8).map((el,index) => {
+        const r = el.getBoundingClientRect();
+        const s = getComputedStyle(el);
+        return {
+          index,
+          text: (el.textContent || '').trim().slice(0,80),
+          x: Math.round(r.x),
+          y: Math.round(r.y),
+          width: Math.round(r.width),
+          height: Math.round(r.height),
+          fontSize: s.fontSize,
+          lineHeight: s.lineHeight
+        };
+      })
     };
   });
 }
